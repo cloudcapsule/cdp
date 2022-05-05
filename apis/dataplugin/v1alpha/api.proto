@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package dataplugin.v1alpha;
+
+
+service DataPluginService {
+  rpc Registration(RegistrationRequest) returns (RegistrationResponse) {}
+  rpc SubmitDataTask(SubmitDataTaskRequest) returns (SubmitDataTaskResponse){}
+  rpc DataTaskStatus(DataTaskStatusRequest) returns (DataTaskStatusResponse){}
+  rpc Healthiness(HealthinessRequest) returns (HealthinessResponse){}
+}
+
+message TaskParam {
+  string name = 1;
+  string label = 2;
+  string type = 3; // bool, string, number
+  bool sensitiv = 4;
+  int32 index = 5;
+}
+
+message Task{
+  string uuid = 1;
+  string name = 2;
+  repeated TaskParam task_params = 3;
+}
+
+message TaskStatus{
+  string run_id = 1;
+  Task task = 2;
+}
+
+message RegistrationRequest{}
+message RegistrationResponse{
+  repeated Task tasks = 1;
+}
+
+message SubmitDataTaskRequest{
+  Task task = 1;
+  bool dry_run = 2;
+}
+message SubmitDataTaskResponse{
+  TaskStatus task_status = 1;
+}
+
+message DataTaskStatusRequest{
+  string run_id = 1;
+}
+
+message DataTaskStatusResponse{
+  TaskStatus task_status = 1;
+}
+
+message HealthinessRequest{}
+message HealthinessResponse{
+  string message = 1;
+}
