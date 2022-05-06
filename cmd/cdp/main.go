@@ -8,10 +8,12 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
+	"syscall"
 )
 
 type param struct {
@@ -47,6 +49,7 @@ var (
 		Short: "Start cdp server",
 		Run: func(cmd *cobra.Command, args []string) {
 			sigCh := make(chan os.Signal)
+			signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
 			dt := []task.DataTask{&task.PGTask{}}
 			svc := plugin.NewDataPluginService(task.NewExecutor(dt))
 			svc.Serve()
