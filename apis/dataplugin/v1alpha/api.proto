@@ -27,7 +27,8 @@ message Task{
 
 message TaskStatus{
   string run_id = 1;
-  Task task = 2;
+  string state = 2;
+  Task task = 3;
 }
 
 message RegistrationRequest{}

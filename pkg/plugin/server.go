@@ -2,13 +2,16 @@ package plugin
 
 import (
 	"context"
+	"errors"
 	datapluginapi "github.com/cloudcapsule/cdp/gen/proto/go/dataplugin/v1alpha"
 	"github.com/cloudcapsule/cdp/pkg/task"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/status"
 	"net"
 )
 
@@ -36,11 +39,31 @@ func (s *DataPluginService) SubmitDataTask(ctx context.Context, request *dataplu
 	id := uuid.New().String()
 	pg := task.NewPGTask(id)
 	executor.ExecutionQueue <- pg
-	return &datapluginapi.SubmitDataTaskResponse{}, nil
+	return &datapluginapi.SubmitDataTaskResponse{TaskStatus: &datapluginapi.TaskStatus{
+		RunId: id,
+		Task: &datapluginapi.Task{
+			Uuid:       "task-uuid",
+			Name:       "pg-backup",
+			TaskParams: request.Task.TaskParams,
+		},
+	}}, nil
 }
 
 func (s *DataPluginService) DataTaskStatus(ctx context.Context, request *datapluginapi.DataTaskStatusRequest) (*datapluginapi.DataTaskStatusResponse, error) {
-	return nil, nil
+	t := executor.GetActiveTask(request.RunId)
+	if t == nil {
+		return &datapluginapi.DataTaskStatusResponse{}, status.Error(codes.NotFound, errors.New("not found").Error())
+	}
+	response := &datapluginapi.DataTaskStatusResponse{
+		TaskStatus: &datapluginapi.TaskStatus{
+			RunId: request.RunId,
+			State: string(t.GetState()),
+			Task: &datapluginapi.Task{
+				Uuid: t.GetUUID(),
+				Name: t.GetName(),
+			},
+		}}
+	return response, nil
 }
 
 func (s *DataPluginService) Healthiness(ctx context.Context, request *datapluginapi.HealthinessRequest) (*datapluginapi.HealthinessResponse, error) {

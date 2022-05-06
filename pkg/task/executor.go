@@ -14,6 +14,13 @@ func (e *Executor) AddActiveTask(dt DataTask) {
 	e.ActiveTasks[dt.GetRunId()] = dt
 }
 
+func (e *Executor) GetActiveTask(runId string) DataTask {
+	if task, ok := e.ActiveTasks[runId]; ok {
+		return task
+	}
+	return nil
+}
+
 func (e *Executor) ExecLoop() {
 	for t := range e.ExecutionQueue {
 		e.AddActiveTask(t)

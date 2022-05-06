@@ -14,23 +14,6 @@ type PGTask struct {
 	*DataTaskLog
 }
 
-//func (t *PGTask) InfoLog(msg string) {
-//	l := log.WithFields(log.Fields{"runId": t.taskRunID, "task": t.name})
-//	t.log = append(t.log, &DataTaskLogEntry{Message: msg, Level: Info})
-//	l.Info(msg)
-//
-//}
-//
-//func (t *PGTask) WarningLog(msg string) {
-//	t.log = append(t.log, &DataTaskLogEntry{Message: msg, Level: Warning})
-//	log.Warning(msg)
-//}
-//
-//func (t *PGTask) ErrorLog(msg string) {
-//	t.log = append(t.log, &DataTaskLogEntry{Message: msg, Level: Error})
-//	log.Error(msg)
-//}
-
 func (t *PGTask) GetName() (taskName string) {
 	return "postgresql-data-task"
 }
@@ -50,9 +33,9 @@ func (t *PGTask) GetState() DataTaskState {
 func (t *PGTask) Start() {
 	t.state = Running
 	t.Info("starting task execution")
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 1000; i++ {
 		t.Info("task is running...")
-		time.Sleep(1 * time.Second)
+		time.Sleep(30 * time.Second)
 	}
 	t.Info("task is done...")
 	t.state = Done
