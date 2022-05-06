@@ -3,7 +3,7 @@ module github.com/cloudcapsule/cdp
 go 1.18
 
 require (
-	github.com/fsnotify/fsnotify v1.5.4
+	github.com/google/uuid v1.1.2
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.11.0
@@ -12,6 +12,7 @@ require (
 )
 
 require (
+	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect

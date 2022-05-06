@@ -48,7 +48,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			sigCh := make(chan os.Signal)
 			dt := []task.DataTask{&task.PGTask{}}
-			svc := plugin.NewDataPluginService(dt)
+			svc := plugin.NewDataPluginService(task.NewExecutor(dt))
 			svc.Serve()
 			<-sigCh
 		},

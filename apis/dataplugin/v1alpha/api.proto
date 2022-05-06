@@ -16,6 +16,7 @@ message TaskParam {
   string type = 3; // bool, string, number
   bool sensitiv = 4;
   int32 index = 5;
+  string value = 6;
 }
 
 message Task{

@@ -4,6 +4,7 @@ import (
 	"context"
 	datapluginapi "github.com/cloudcapsule/cdp/gen/proto/go/dataplugin/v1alpha"
 	"github.com/cloudcapsule/cdp/pkg/task"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
@@ -15,11 +16,11 @@ type DataPluginService struct {
 	datapluginapi.UnimplementedDataPluginServiceServer
 }
 
-var dataTasks []task.DataTask
+var executor *task.Executor
 
 func (s *DataPluginService) Registration(ctx context.Context, request *datapluginapi.RegistrationRequest) (*datapluginapi.RegistrationResponse, error) {
 	response := &datapluginapi.RegistrationResponse{}
-	for _, dt := range dataTasks {
+	for _, dt := range executor.GetRegisteredTask() {
 
 		t := &datapluginapi.Task{
 			Uuid:       dt.GetName(),
@@ -32,7 +33,10 @@ func (s *DataPluginService) Registration(ctx context.Context, request *dataplugi
 }
 
 func (s *DataPluginService) SubmitDataTask(ctx context.Context, request *datapluginapi.SubmitDataTaskRequest) (*datapluginapi.SubmitDataTaskResponse, error) {
-	return nil, nil
+	id := uuid.New().String()
+	pg := task.NewPGTask(id)
+	executor.ExecutionQueue <- pg
+	return &datapluginapi.SubmitDataTaskResponse{}, nil
 }
 
 func (s *DataPluginService) DataTaskStatus(ctx context.Context, request *datapluginapi.DataTaskStatusRequest) (*datapluginapi.DataTaskStatusResponse, error) {
@@ -61,8 +65,9 @@ func (s *DataPluginService) Serve() {
 	}()
 }
 
-func NewDataPluginService(dt []task.DataTask) *DataPluginService {
-	dataTasks = dt
+func NewDataPluginService(e *task.Executor) *DataPluginService {
+	executor = e
+	executor.Start()
 	pluginSvc := &DataPluginService{}
 	return pluginSvc
 }
