@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package dataplugin.v1alpha;
 
+import "google/api/annotations.proto";
 
 service DataPluginService {
   rpc Registration(RegistrationRequest) returns (RegistrationResponse) {}

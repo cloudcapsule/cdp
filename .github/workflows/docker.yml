@@ -1,0 +1,27 @@
+name: build and push docker image
+on: [ push ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Extract repo/branch name
+      shell: bash
+      run: |
+          echo "::set-output name=docker_repo::capsule-cdp"
+          echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/*/})"
+          echo "##[set-output name=head;]$(git rev-parse --short HEAD)"
+          echo "##[set-output name=repo_url;]$(echo $GITHUB_SERVER_URL/$GITHUB_REPOSITORY)"
+      id: extract_info
+
+    - name: 'Build and push image'
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+    - run: |
+        docker build --build-arg BUILD_SHA=${{ github.sha }} -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ steps.extract_info.outputs.docker_repo }}:latest .
+        docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ steps.extract_info.outputs.docker_repo }}:latest
