@@ -3,7 +3,7 @@ managed:
   enabled: true
   optimize_for: CODE_SIZE
   go_package_prefix:
-    default: github.com/cloudcapsule/capsule-server/gen/proto/go
+    default: github.com/cloudcapsule/cdp/gen/proto/go
     except:
       - buf.build/googleapis/googleapis
 plugins:

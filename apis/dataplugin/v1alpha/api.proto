@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package dataplugin.v1alpha;
 
-import "google/api/annotations.proto";
-
 service DataPluginService {
   rpc Registration(RegistrationRequest) returns (RegistrationResponse) {}
   rpc SubmitDataTask(SubmitDataTaskRequest) returns (SubmitDataTaskResponse){}
@@ -20,7 +18,7 @@ message TaskParam {
   string value = 6;
 }
 
-message Task{
+message DataTask{
   string uuid = 1;
   string name = 2;
   repeated TaskParam task_params = 3;
@@ -29,16 +27,16 @@ message Task{
 message TaskStatus{
   string run_id = 1;
   string state = 2;
-  Task task = 3;
+  DataTask task = 3;
 }
 
 message RegistrationRequest{}
 message RegistrationResponse{
-  repeated Task tasks = 1;
+  repeated DataTask tasks = 1;
 }
 
 message SubmitDataTaskRequest{
-  Task task = 1;
+  DataTask task = 1;
   bool dry_run = 2;
 }
 message SubmitDataTaskResponse{
@@ -48,7 +46,6 @@ message SubmitDataTaskResponse{
 message DataTaskStatusRequest{
   string run_id = 1;
 }
-
 message DataTaskStatusResponse{
   TaskStatus task_status = 1;
 }

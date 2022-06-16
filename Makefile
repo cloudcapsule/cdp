@@ -2,7 +2,7 @@ build:
 	go build -o bin/cdp cmd/cdp/main.go
 
 build-proto:
-	buf mod update apis/dataplugin
+	buf mod update apis
 	buf lint
 	buf build
 	buf generate
