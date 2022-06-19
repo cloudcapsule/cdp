@@ -2,10 +2,10 @@ version: v1
 managed:
   enabled: true
   optimize_for: CODE_SIZE
-  go_package_prefix:
-    default: github.com/cloudcapsule/cdp/gen/proto/go
-    except:
-      - buf.build/googleapis/googleapis
+#  go_package_prefix:
+#    default: github.com/cloudcapsule/cdp/gen/proto/go
+#    except:
+#      - buf.build/googleapis/googleapis
 plugins:
   - name: go
     opt: paths=source_relative

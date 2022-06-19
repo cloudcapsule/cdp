@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package dataplugin.v1alpha;
 
+option go_package = "github.com/cloudcapsule/cdp/gen/proto/go/dataplugin/v1alpha;cdpv1alpha";
+
 service DataPluginService {
   rpc Registration(RegistrationRequest) returns (RegistrationResponse) {}
   rpc SubmitDataTask(SubmitDataTaskRequest) returns (SubmitDataTaskResponse){}
