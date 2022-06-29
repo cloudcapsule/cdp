@@ -25,7 +25,7 @@ func (s *DataPluginService) Registration(ctx context.Context, request *dataplugi
 	response := &datapluginapi.RegistrationResponse{}
 	for _, dt := range executor.GetRegisteredTask() {
 
-		t := &datapluginapi.Task{
+		t := &datapluginapi.DataTask{
 			Uuid:       dt.GetName(),
 			Name:       dt.GetName(),
 			TaskParams: dt.InputParams(),
@@ -41,7 +41,7 @@ func (s *DataPluginService) SubmitDataTask(ctx context.Context, request *dataplu
 	executor.ExecutionQueue <- pg
 	return &datapluginapi.SubmitDataTaskResponse{TaskStatus: &datapluginapi.TaskStatus{
 		RunId: id,
-		Task: &datapluginapi.Task{
+		Task: &datapluginapi.DataTask{
 			Uuid:       "task-uuid",
 			Name:       "pg-backup",
 			TaskParams: request.Task.TaskParams,
@@ -58,7 +58,7 @@ func (s *DataPluginService) DataTaskStatus(ctx context.Context, request *dataplu
 		TaskStatus: &datapluginapi.TaskStatus{
 			RunId: request.RunId,
 			State: string(t.GetState()),
-			Task: &datapluginapi.Task{
+			Task: &datapluginapi.DataTask{
 				Uuid: t.GetUUID(),
 				Name: t.GetName(),
 			},
