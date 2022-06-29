@@ -3,7 +3,7 @@ package plugin
 import (
 	"context"
 	"errors"
-	datapluginapi "github.com/cloudcapsule/cdp/gen/proto/go/dataplugin/v1alpha"
+	dpv1alpha "github.com/cloudcapsule/cdp/gen/proto/go/dataplugin/v1alpha"
 	"github.com/cloudcapsule/cdp/pkg/task"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
@@ -16,32 +16,32 @@ import (
 )
 
 type DataPluginService struct {
-	datapluginapi.UnimplementedDataPluginServiceServer
+	dpv1alpha.UnimplementedDataPluginServiceServer
 }
 
 var executor *task.Executor
 
-func (s *DataPluginService) Registration(ctx context.Context, request *datapluginapi.RegistrationRequest) (*datapluginapi.RegistrationResponse, error) {
-	response := &datapluginapi.RegistrationResponse{}
+func (s *DataPluginService) Registration(ctx context.Context, request *dpv1alpha.RegistrationRequest) (*dpv1alpha.RegistrationResponse, error) {
+	response := &dpv1alpha.RegistrationResponse{}
+	response.PluginId = viper.GetString("plugin-id")
 	for _, dt := range executor.GetRegisteredTask() {
-
-		t := &datapluginapi.DataTask{
+		t := &dpv1alpha.DataTask{
 			Uuid:       dt.GetName(),
 			Name:       dt.GetName(),
 			TaskParams: dt.InputParams(),
 		}
-		response.Tasks = append(response.Tasks, t)
+		response.DataTasks = append(response.DataTasks, t)
 	}
 	return response, nil
 }
 
-func (s *DataPluginService) SubmitDataTask(ctx context.Context, request *datapluginapi.SubmitDataTaskRequest) (*datapluginapi.SubmitDataTaskResponse, error) {
+func (s *DataPluginService) SubmitDataTask(ctx context.Context, request *dpv1alpha.SubmitDataTaskRequest) (*dpv1alpha.SubmitDataTaskResponse, error) {
 	id := uuid.New().String()
 	pg := task.NewPGTask(id)
 	executor.ExecutionQueue <- pg
-	return &datapluginapi.SubmitDataTaskResponse{TaskStatus: &datapluginapi.TaskStatus{
+	return &dpv1alpha.SubmitDataTaskResponse{TaskStatus: &dpv1alpha.TaskStatus{
 		RunId: id,
-		Task: &datapluginapi.DataTask{
+		Task: &dpv1alpha.DataTask{
 			Uuid:       "task-uuid",
 			Name:       "pg-backup",
 			TaskParams: request.Task.TaskParams,
@@ -49,16 +49,16 @@ func (s *DataPluginService) SubmitDataTask(ctx context.Context, request *dataplu
 	}}, nil
 }
 
-func (s *DataPluginService) DataTaskStatus(ctx context.Context, request *datapluginapi.DataTaskStatusRequest) (*datapluginapi.DataTaskStatusResponse, error) {
+func (s *DataPluginService) DataTaskStatus(ctx context.Context, request *dpv1alpha.DataTaskStatusRequest) (*dpv1alpha.DataTaskStatusResponse, error) {
 	t := executor.GetActiveTask(request.RunId)
 	if t == nil {
-		return &datapluginapi.DataTaskStatusResponse{}, status.Error(codes.NotFound, errors.New("not found").Error())
+		return &dpv1alpha.DataTaskStatusResponse{}, status.Error(codes.NotFound, errors.New("not found").Error())
 	}
-	response := &datapluginapi.DataTaskStatusResponse{
-		TaskStatus: &datapluginapi.TaskStatus{
+	response := &dpv1alpha.DataTaskStatusResponse{
+		TaskStatus: &dpv1alpha.TaskStatus{
 			RunId: request.RunId,
 			State: string(t.GetState()),
-			Task: &datapluginapi.DataTask{
+			Task: &dpv1alpha.DataTask{
 				Uuid: t.GetUUID(),
 				Name: t.GetName(),
 			},
@@ -66,8 +66,8 @@ func (s *DataPluginService) DataTaskStatus(ctx context.Context, request *dataplu
 	return response, nil
 }
 
-func (s *DataPluginService) Healthiness(ctx context.Context, request *datapluginapi.HealthinessRequest) (*datapluginapi.HealthinessResponse, error) {
-	return &datapluginapi.HealthinessResponse{Message: "ok"}, nil
+func (s *DataPluginService) Healthiness(ctx context.Context, request *dpv1alpha.HealthinessRequest) (*dpv1alpha.HealthinessResponse, error) {
+	return &dpv1alpha.HealthinessResponse{Message: "ok"}, nil
 }
 
 func (s *DataPluginService) Serve() {
@@ -80,7 +80,7 @@ func (s *DataPluginService) Serve() {
 
 		grpcServer := grpc.NewServer()
 		plugin := &DataPluginService{}
-		datapluginapi.RegisterDataPluginServiceServer(grpcServer, plugin)
+		dpv1alpha.RegisterDataPluginServiceServer(grpcServer, plugin)
 		reflection.Register(grpcServer)
 		if err := grpcServer.Serve(lis); err != nil {
 			log.Fatal(err)

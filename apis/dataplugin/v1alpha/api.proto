@@ -34,7 +34,8 @@ message TaskStatus{
 
 message RegistrationRequest{}
 message RegistrationResponse{
-  repeated DataTask tasks = 1;
+  string plugin_id = 1;
+  repeated DataTask data_tasks = 2;
 }
 
 message SubmitDataTaskRequest{
