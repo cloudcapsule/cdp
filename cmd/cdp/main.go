@@ -32,7 +32,7 @@ var (
 	}
 	startParams = []param{
 		{name: "addr", shorthand: "a", value: "0.0.0.0:50052", usage: "bind grpc server address"},
-		{name: "plugin-id", shorthand: "pid", value: "", usage: "plugin id - API reference to the plugin definition"},
+		{name: "plugin-id", shorthand: "p", value: "", usage: "plugin id - API reference to the plugin definition"},
 	}
 	rootCmd = &cobra.Command{
 		Use:   "cdp",
